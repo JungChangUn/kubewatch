@@ -4,6 +4,8 @@
 
 **kubewatch** is a Kubernetes watcher that currently publishes notification to available collaboration hubs/notification channels. Run it in your k8s cluster, and you will get event notifications through webhooks.
 
+This modification is for remove update resorces and cronjob from monitoring. Unfortunately config file of removing resource is not supported.
+
 # Usage
 ```
 $ kubewatch -h
@@ -41,14 +43,7 @@ Use "kubewatch [command] --help" for more information about a command.
 
 ### Cluster Installation
 #### Using helm:
-
-When you have helm installed in your cluster, use the following setup:
-
-```console
-helm install --name kubewatch stable/kubewatch --set='rbac.create=true,slack.channel=#YOUR_CHANNEL,slack.token=xoxb-YOUR_TOKEN,resourcesToWatch.pod=true,resourcesToWatch.daemonset=true'
-```
-
-You may also provide a values file instead:
+Using helm is not tested.
 
 ```yaml
 rbac:

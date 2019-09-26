@@ -6,9 +6,8 @@ data:
   .kubewatch.yaml: |
     namespace: ""
     handler:
-      slack:
-        token: <token>
-        channel: <channel>
+      webhook:
+        url: <webhook>
     resource:
       deployment: false
       replicationcontroller: false

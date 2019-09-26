@@ -2,16 +2,35 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: kubewatch
-  namespace: default
+  namespace : monitor
 spec:
   containers:
-  - image: tuna/kubewatch:v0.0.1
+  - image: jungchangun/kubewatch:latest
+  # bitnami/kubewatch:latest
+    env : 
+    - name : KW_WEBHOOK_URL
+      value : ""
+    resources:
+      requests:
+        memory: "10Mi"
+        cpu: "05m"
+      limits:
+        memory: "20Mi"
+        cpu: "10m"
     imagePullPolicy: Always
     name: kubewatch
     volumeMounts:
     - name: config-volume
-      mountPath: /root
-  - image: gcr.io/skippbox/kubectl:v1.3.0
+      mountPath: /.kubewatch.yaml
+      subPath: .kubewatch.yaml
+  - image: bitnami/kubectl:latest
+    resources:
+      requests:
+        memory: "10Mi"
+        cpu: "05m"
+      limits:
+        memory: "15Mi"
+        cpu: "10m"
     args:
       - proxy
       - "-p"
@@ -19,6 +38,8 @@ spec:
     name: proxy
     imagePullPolicy: Always
   restartPolicy: Always
+  serviceAccount: kubewatch
+  serviceAccountName: kubewatch
   volumes:
   - name: config-volume
     configMap:
