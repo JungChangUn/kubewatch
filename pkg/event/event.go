@@ -17,6 +17,8 @@ import (
 	"fmt"
 
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
+	// "github.com/Sirupsen/logrus"
+	// "encoding/json"
 	apps_v1beta1 "k8s.io/api/apps/v1beta1"
 	batch_v1 "k8s.io/api/batch/v1"
 	api_v1 "k8s.io/api/core/v1"
@@ -94,6 +96,12 @@ func New(obj interface{}, action string) Event {
 		Status:    status,
 		Name:      name,
 	}
+	// out, err := json.Marshal(kbEvent)
+	// if err != nil {
+    //     panic (err)
+    // }
+
+	// logrus.Infof(string(out))
 	return kbEvent
 }
 

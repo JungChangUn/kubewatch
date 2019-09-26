@@ -14,6 +14,8 @@ RUN cd "$GOPATH/src/github.com/bitnami-labs/kubewatch" && \
 FROM bitnami/minideb:stretch
 RUN install_packages ca-certificates
 
+ADD entrypoint.sh /
+RUN chmod +x entrypoint.sh  
 COPY --from=builder /kubewatch /bin/kubewatch
 
-ENTRYPOINT ["/bin/kubewatch"]
+ENTRYPOINT ["/entrypoint.sh"]

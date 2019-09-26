@@ -22,12 +22,14 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers"
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
+	// "encoding/json"
 
 	apps_v1beta1 "k8s.io/api/apps/v1beta1"
 	batch_v1 "k8s.io/api/batch/v1"
@@ -78,9 +80,13 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
+					// var podL1 = 
+					// logrus.Infof(podL1)
 					return kubeClient.CoreV1().Pods(conf.Namespace).List(options)
 				},
 				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
+					// var podW1 = 
+					// logrus.Infof(podW1)
 					return kubeClient.CoreV1().Pods(conf.Namespace).Watch(options)
 				},
 			},
@@ -348,13 +354,24 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 	var newEvent Event
 	var err error
+
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			newEvent.key, err = cache.MetaNamespaceKeyFunc(obj)
 			newEvent.eventType = "create"
 			newEvent.resourceType = resourceType
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, newEvent.key)
-			if err == nil {
+				// get object's metedata
+			e := event.New(obj, newEvent.eventType)
+			// out, err2 := json.Marshal(e)
+			// if err2 != nil {
+			// 	panic (err2)
+			// }
+
+			// logrus.Infof(string(out))
+			if strings.Contains(e.Name, "cronjob") {
+				logrus.Infof("cronjob!!!!! : " + string(e.Name))
+			} else if err == nil {
 				queue.Add(newEvent)
 			}
 		},
@@ -363,8 +380,17 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.eventType = "update"
 			newEvent.resourceType = resourceType
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing update to %v: %s", resourceType, newEvent.key)
-			if err == nil {
-				queue.Add(newEvent)
+			e := event.New(old, newEvent.eventType)
+			// out, err2 := json.Marshal(e)
+			// if err2 != nil {
+			// 	panic (err2)
+			// }
+
+			// logrus.Infof(string(out))
+			if strings.Contains(e.Name, "cronjob") {
+				logrus.Infof("cronjob~!!!!! : " + string(e.Name))
+			} else if err == nil {
+				// queue.Add(newEvent)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
@@ -373,7 +399,16 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.resourceType = resourceType
 			newEvent.namespace = utils.GetObjectMetaData(obj).Namespace
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing delete to %v: %s", resourceType, newEvent.key)
-			if err == nil {
+			e := event.New(obj, newEvent.eventType)
+			// out, err2 := json.Marshal(e)
+			// if err2 != nil {
+			// 	panic (err2)
+			// }
+
+			// logrus.Infof(string(out))
+			if strings.Contains(e.Name, "cronjob") {
+				logrus.Infof("cronjob~!!!!! : " + string(e.Name))
+			} else if err == nil {
 				queue.Add(newEvent)
 			}
 		},
@@ -459,7 +494,7 @@ func (c *Controller) processItem(newEvent Event) error {
 	if err != nil {
 		return fmt.Errorf("Error fetching object with key %s from store: %v", newEvent.key, err)
 	}
-	// get object's metedata
+
 	objectMeta := utils.GetObjectMetaData(obj)
 
 	// process events based on its type
