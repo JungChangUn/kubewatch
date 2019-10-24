@@ -369,8 +369,10 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			// }
 
 			// logrus.Infof(string(out))
-			if strings.Contains(e.Name, "cronjob") {
-				logrus.Infof("cronjob!!!!! : " + string(e.Name))
+			if ( strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
+				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
+				strings.Contains(e.Name, "presto-worker") ) {
+				logrus.Infof("skipped : " + string(e.Name))
 			} else if err == nil {
 				queue.Add(newEvent)
 			}
