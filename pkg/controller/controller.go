@@ -20,15 +20,16 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
-	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/bitnami-labs/kubewatch/config"
 	"github.com/bitnami-labs/kubewatch/pkg/event"
 	"github.com/bitnami-labs/kubewatch/pkg/handlers"
 	"github.com/bitnami-labs/kubewatch/pkg/utils"
+
 	// "encoding/json"
 
 	apps_v1beta1 "k8s.io/api/apps/v1beta1"
@@ -80,12 +81,12 @@ func Start(conf *config.Config, eventHandler handlers.Handler) {
 		informer := cache.NewSharedIndexInformer(
 			&cache.ListWatch{
 				ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
-					// var podL1 = 
+					// var podL1 =
 					// logrus.Infof(podL1)
 					return kubeClient.CoreV1().Pods(conf.Namespace).List(options)
 				},
 				WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
-					// var podW1 = 
+					// var podW1 =
 					// logrus.Infof(podW1)
 					return kubeClient.CoreV1().Pods(conf.Namespace).Watch(options)
 				},
@@ -361,7 +362,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			newEvent.eventType = "create"
 			newEvent.resourceType = resourceType
 			logrus.WithField("pkg", "kubewatch-"+resourceType).Infof("Processing add to %v: %s", resourceType, newEvent.key)
-				// get object's metedata
+			// get object's metedata
 			e := event.New(obj, newEvent.eventType)
 			// out, err2 := json.Marshal(e)
 			// if err2 != nil {
@@ -369,9 +370,12 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			// }
 
 			// logrus.Infof(string(out))
-			if ( strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
+			if strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
 				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
-				strings.Contains(e.Name, "presto-worker") ) {
+				strings.Contains(e.Name, "fluentd") ||
+				strings.Contains(e.Name, "hudi") ||
+				strings.Contains(e.Namespace, "kube-job") ||
+				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
 				logrus.Infof("skipped add: " + string(e.Name))
 			} else if err == nil {
 				queue.Add(newEvent)
@@ -408,9 +412,12 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			// }
 
 			// logrus.Infof(string(out))
-			if ( strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
+			if strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
 				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
-				strings.Contains(e.Name, "presto-worker") ) {
+				strings.Contains(e.Name, "fluentd") ||
+				strings.Contains(e.Name, "hudi") ||
+				strings.Contains(e.Namespace, "kube-job") ||
+				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
 				logrus.Infof("skipped delete : " + string(e.Name))
 			} else if err == nil {
 				queue.Add(newEvent)
