@@ -375,7 +375,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 				strings.Contains(e.Name, "fluentd") ||
 				// strings.Contains(e.Name, "hudi") ||
 				strings.Contains(e.Name, "hanging-pod-check") ||
-				strings.Contains(e.Name, "airflow-job-") && strings.Contains(e.Namespace, "spark-operator") ||
+				strings.Contains(e.Name, "airflow-job-") ||
 				strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
 				strings.Contains(e.Namespace, "kube-job") ||
 				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
@@ -420,7 +420,7 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 				strings.Contains(e.Name, "fluentd") ||
 				// strings.Contains(e.Name, "hudi") ||
 				strings.Contains(e.Name, "hanging-pod-check") ||
-				strings.Contains(e.Name, "airflow-job-") && strings.Contains(e.Namespace, "spark-operator") ||
+				strings.Contains(e.Name, "airflow-job-") ||
 				strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
 				strings.Contains(e.Namespace, "kube-job") ||
 				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
