@@ -373,7 +373,10 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			if strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
 				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
 				strings.Contains(e.Name, "fluentd") ||
-				strings.Contains(e.Name, "hudi") ||
+				// strings.Contains(e.Name, "hudi") ||
+				strings.Contains(e.Name, "hanging-pod-check") ||
+				strings.Contains(e.Name, "airflow-job-") && strings.Contains(e.Namespace, "spark-operator") ||
+				strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
 				strings.Contains(e.Namespace, "kube-job") ||
 				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
 				logrus.Infof("skipped add: " + string(e.Name))
@@ -415,7 +418,10 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 			if strings.Contains(e.Name, "cronjob") || strings.Contains(e.Name, "kube-proxy") ||
 				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
 				strings.Contains(e.Name, "fluentd") ||
-				strings.Contains(e.Name, "hudi") ||
+				// strings.Contains(e.Name, "hudi") ||
+				strings.Contains(e.Name, "hanging-pod-check") ||
+				strings.Contains(e.Name, "airflow-job-") && strings.Contains(e.Namespace, "spark-operator") ||
+				strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
 				strings.Contains(e.Namespace, "kube-job") ||
 				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
 				logrus.Infof("skipped delete : " + string(e.Name))
