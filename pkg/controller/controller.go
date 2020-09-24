@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -374,10 +375,15 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
 				strings.Contains(e.Name, "fluentd") ||
 				// strings.Contains(e.Name, "hudi") ||
-				strings.Contains(e.Name, "hanging-pod-check") ||
+				strings.Contains(e.Name, "pod-check") ||
 				strings.Contains(e.Name, "airflow-job-") ||
-				strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
+				strings.Contains(e.Name, "spark-eventlog-delete") ||
+				// strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
+				strings.Contains(e.Namespace, "spark-operator") && regexp.MatchString("-driver$", e.Name) ||
+				strings.Contains(e.Namespace, "spark-operator") && regexp.MatchString("-exec-[0-9]+$", e.Name) ||
 				strings.Contains(e.Namespace, "kube-job") ||
+				strings.Contains(e.Namespace, "kubeflow") ||
+				strings.Contains(e.Namespace, "istio-system") ||
 				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
 				logrus.Infof("skipped add: " + string(e.Name))
 			} else if err == nil {
@@ -419,10 +425,15 @@ func newResourceController(client kubernetes.Interface, eventHandler handlers.Ha
 				strings.Contains(e.Name, "aws-node") || strings.Contains(e.Name, "prometheus-node") ||
 				strings.Contains(e.Name, "fluentd") ||
 				// strings.Contains(e.Name, "hudi") ||
-				strings.Contains(e.Name, "hanging-pod-check") ||
+				strings.Contains(e.Name, "pod-check") ||
 				strings.Contains(e.Name, "airflow-job-") ||
-				strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
+				strings.Contains(e.Name, "spark-eventlog-delete") ||
+				// strings.Contains(e.Name, "spark") && strings.Contains(e.Name, "driver") && strings.Contains(e.Kind, "service") ||
+				strings.Contains(e.Namespace, "spark-operator") && regexp.MatchString("-driver$", e.Name) ||
+				strings.Contains(e.Namespace, "spark-operator") && regexp.MatchString("-exec-[0-9]+$", e.Name) ||
 				strings.Contains(e.Namespace, "kube-job") ||
+				strings.Contains(e.Namespace, "kubeflow") ||
+				strings.Contains(e.Namespace, "istio-system") ||
 				strings.Contains(e.Name, "presto") && strings.Contains(e.Name, "worker") {
 				logrus.Infof("skipped delete : " + string(e.Name))
 			} else if err == nil {
